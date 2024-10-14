@@ -3,7 +3,7 @@
     <img src="https://cdn.swiftlycs2.net/swiftly-logo.png" alt="SwiftlyLogo" width="80" height="80">
   </a>
 
-  <h3 align="center">[Swiftly] MVP Sound</h3>
+  <h3 align="center">[Swiftly] Damage Printer</h3>
 
   <p align="center">
     A simple plugin for Swiftly that implements damage print like in FACEIT.
