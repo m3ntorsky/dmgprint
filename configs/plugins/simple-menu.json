@@ -1,0 +1,36 @@
+{
+    "menus": {
+        "test": {
+            "title": "Test Menu",
+            "color": "ff2131",
+            "items": [
+                {
+                    "displayName": "say Hello",
+                    "openmenu": "message",
+                    "value": "Hello from test menu"
+                },
+                {
+                    "displayName": "Go to Menu2",
+                    "openmenu": "command",
+                    "value": "sw_test2"
+                }
+            ]
+        },
+        "test2": {
+            "title": "Test2 Menu",
+            "color": "ff2131",
+            "items": [
+                {
+                    "displayName": "say Hello",
+                    "openmenu": "message",
+                    "value": "Hello from test2 menu"
+                },
+                {
+                    "displayName": "Go to Menu1",
+                    "openmenu": "command",
+                    "value": "sw_test"
+                }
+            ]
+        }
+    }
+}

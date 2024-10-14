@@ -1,0 +1,8 @@
+{
+    "info": {
+        "en" : "--> {green}({DMG_TO} HP / {HITS_TO} hits){default} to {red}({DMG_FROM} HP / {HITS_FROM} hits){default} from {NAME} ({HEALTH} HP)"
+    },
+    "must_die": {
+        "en" : "{red}To see damages you have to be die.{default}"        
+    }
+}
