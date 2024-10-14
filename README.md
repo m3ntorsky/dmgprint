@@ -30,7 +30,7 @@
 * After installing the plugin, you can change prefix in `addons/swiftly/configs/plugins/dmgprint.json`
 * After installing the plugin, you can change display info  in `addons/swiftly/translations/translation.dmgprint.json`
 
-### MVP Commands 💬
+### Commands 💬
 
 * Base commands provided by this plugin:
 
