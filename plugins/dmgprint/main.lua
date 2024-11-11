@@ -25,10 +25,10 @@ local PrintDamageInfo = function(playerid)
             victimHealth = 0
         end
         local message, _ = FetchTranslation("dmgprint.info")
-            :gsub("{DMG_TO}", Damage[playerid][i])
-            :gsub("{HITS_TO}", DamageHits[playerid][i])
-            :gsub("{DMG_FROM}",Damage[i][playerid])
-            :gsub("{HITS_FROM}", DamageHits[i][playerid])
+            :gsub("{DMG_TO}", Damage[playerid][i] or 0)
+            :gsub("{HITS_TO}", DamageHits[playerid][i] or 0)
+            :gsub("{DMG_FROM}", Damage[i][playerid] or 0)
+            :gsub("{HITS_FROM}", DamageHits[i][playerid] or 0)
             :gsub("{NAME}", victim:CBasePlayerController().PlayerName)
             :gsub("{HEALTH}", victimHealth)
 
