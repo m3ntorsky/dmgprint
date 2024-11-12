@@ -1,29 +1,44 @@
 local Damage = {}
 local DamageHits = {}
 
-local PrintDamageInfo = function(playerid)
+
+local function IsValidPlayer(player)
+    return player and player:IsValid()
+end
+
+
+local function InitializeDamageTables()
+    for i = 0, playermanager:GetPlayerCap() - 1 do
+        if IsValidPlayer(GetPlayer(i)) then
+            Damage[i] = {}
+            DamageHits[i] = {}
+            for j = 0, playermanager:GetPlayerCap() - 1 do
+                if IsValidPlayer(GetPlayer(j)) then
+                    Damage[i][j] = 0
+                    DamageHits[i][j] = 0
+                end
+            end
+        end
+    end
+end
+
+
+local function PrintDamageInfo(playerid)
     local player = GetPlayer(playerid)
-    if not player or not player:IsValid() then return end
+    if not IsValidPlayer(player) then return end
 
     local team = player:CBaseEntity().TeamNum
+    if team ~= Team.CT and team ~= Team.T then return end
 
-    if team ~= Team.CT and team ~= Team.T then
-        return
-    end
+    local otherTeam = (team == Team.CT) and Team.T or Team.CT
 
-    local otherTeam = Team.CT
-
-    if player:CBaseEntity().TeamNum == Team.CT then
-        otherTeam = Team.T
-    end
-
-    for i = 0, playermanager:GetPlayerCap() - 1, 1 do
+    for i = 0, playermanager:GetPlayerCap() - 1 do
         local victim = GetPlayer(i)
-        if not victim or not victim:IsValid() or victim:CBaseEntity().TeamNum ~= otherTeam then goto continue end
-        local victimHealth =victim:CBaseEntity().Health
-        if victimHealth < 0 then
-            victimHealth = 0
+        if not (IsValidPlayer(victim) and victim:CBaseEntity().TeamNum == otherTeam) then
+            goto continue
         end
+
+        local victimHealth = victim:CBaseEntity().Health
         local message, _ = FetchTranslation("dmgprint.info")
             :gsub("{DMG_TO}", Damage[playerid][i] or 0)
             :gsub("{HITS_TO}", DamageHits[playerid][i] or 0)
@@ -32,43 +47,26 @@ local PrintDamageInfo = function(playerid)
             :gsub("{NAME}", victim:CBasePlayerController().PlayerName)
             :gsub("{HEALTH}", victimHealth)
 
-            ReplyToCommand(playerid, tostring(config:Fetch("dmgprint.prefix") or ""), message)
+        ReplyToCommand(playerid, tostring(config:Fetch("dmgprint.prefix") or ""), message)
         ::continue::
     end
 end
 
+
 AddEventHandler("OnRoundStart", function(event)
-    Damage = Damage or {}
-    DamageHits = DamageHits or {}
-
-    for i = 0, playermanager:GetPlayerCap() - 1, 1 do
-        local player = GetPlayer(i)
-        if not player or not player:IsValid() then goto continue end
-
-        Damage[i] = Damage[i] or {}
-        DamageHits[i] = DamageHits[i] or {}
-
-        for j = 0, playermanager:GetPlayerCap() - 1, 1 do
-            local victim = GetPlayer(j)
-            if not victim or not victim:IsValid() then goto continue2 end
-
-            Damage[i][j] = 0
-            DamageHits[i][j] = 0
-            ::continue2::
-        end
-        ::continue::
-    end
+    InitializeDamageTables()
     return EventResult.Continue
 end)
 
-AddEventHandler("OnPostRoundEnd", function (event)
-    for i = 0, playermanager:GetPlayerCap() - 1, 1 do
-        local player = GetPlayer(i)
-        if not player or not player:IsValid() then goto continue end
-        PrintDamageInfo(i)
-        ::continue::   
+
+AddEventHandler("OnPostRoundEnd", function(event)
+    for i = 0, playermanager:GetPlayerCap() - 1 do
+        if IsValidPlayer(GetPlayer(i)) then
+            PrintDamageInfo(i)
+        end
     end
 end)
+
 
 AddEventHandler("OnPlayerHurt", function(event)
     local attackerId = event:GetInt("attacker")
@@ -77,7 +75,7 @@ AddEventHandler("OnPlayerHurt", function(event)
 
     local attacker = GetPlayer(attackerId)
     local victim = GetPlayer(victimId)
-    if not attacker or not attacker:IsValid() or not victim or not victim:IsValid() then return end
+    if not (IsValidPlayer(attacker) and IsValidPlayer(victim)) then return end
 
     local preHealth = victim:CBaseEntity().Health
     local damage = event:GetInt("dmg_health")
@@ -88,21 +86,20 @@ AddEventHandler("OnPlayerHurt", function(event)
     end
 
     Damage[attackerId] = Damage[attackerId] or {}
-    Damage[attackerId][victimId] = Damage[attackerId][victimId] or 0
+    Damage[attackerId][victimId] = (Damage[attackerId][victimId] or 0) + damage
 
     DamageHits[attackerId] = DamageHits[attackerId] or {}
-    DamageHits[attackerId][victimId] = DamageHits[attackerId][victimId] or 0
-
-    Damage[attackerId][victimId] = Damage[attackerId][victimId] + damage
-    DamageHits[attackerId][victimId] = DamageHits[attackerId][victimId] + 1
+    DamageHits[attackerId][victimId] = (DamageHits[attackerId][victimId] or 0) + 1
 end)
 
 
-commands:Register("dmg", function (playerid, args, argc, silent, prefix)
+commands:Register("dmg", function(playerid, args, argc, silent, prefix)
     local player = GetPlayer(playerid)
-    if not player or not player:IsValid() then return end
+    if not IsValidPlayer(player) then return end
+
     if player:CCSPlayerController().PawnIsAlive then
         return ReplyToCommand(playerid, tostring(config:Fetch("dmgprint.prefix")), FetchTranslation("dmgprint.must_die", playerid))
     end
+
     return PrintDamageInfo(playerid)
 end)
