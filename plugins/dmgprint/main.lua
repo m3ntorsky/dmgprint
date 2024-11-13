@@ -38,6 +38,11 @@ local function PrintDamageInfo(playerid)
             goto continue
         end
 
+        Damage[playerid] = Damage[playerid] or {}
+        DamageHits[playerid] = DamageHits[playerid] or {}
+        Damage[i] = Damage[i] or {}
+        DamageHits[i] = DamageHits[i] or {}
+
         local victimHealth = victim:CBaseEntity().Health
         local message, _ = FetchTranslation("dmgprint.info")
             :gsub("{DMG_TO}", Damage[playerid][i] or 0)
